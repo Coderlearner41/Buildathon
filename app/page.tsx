@@ -1,103 +1,168 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+
+export default function LoginPage() {
+  const [mode, setMode] = useState<"email" | "phone">("email");
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data: unknown) => {
+    console.log("Submitted Data:", data);
+    // In a real application, you would send this data to your backend for authentication.
+    router.push("/dashboard"); // redirect after login
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full space-y-6 bg-white shadow-lg rounded-xl p-8">
+        {/* Logo */}
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+            🔒
+          </div>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">InsureAce</h1>
+          <p className="text-gray-600 text-sm">
+            Professional Insurance Management
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Title */}
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Welcome Back</h2>
+          <p className="text-gray-600 text-sm">
+            Sign in to your advisor dashboard
+          </p>
+        </div>
+
+        {/* Toggle */}
+        <div className="relative flex rounded-md overflow-hidden border">
+          {/* Sliding Highlight */}
+          <motion.div
+            layout
+            className="absolute top-0 bottom-0 w-1/2 bg-emerald-500"
+            animate={{ x: mode === "email" ? "0%" : "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          {/* Buttons */}
+          <button
+            onClick={() => setMode("email")}
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium relative z-10 ${
+              mode === "email" ? "text-white" : "text-gray-700"
+            }`}
+          >
+            Email
+          </button>
+          <button
+            onClick={() => setMode("phone")}
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium relative z-10 ${
+              mode === "phone" ? "text-white" : "text-gray-700"
+            }`}
+          >
+            Phone
+          </button>
+        </div>
+        
+        {/* Form with smooth transition */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" 
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}>
+          {mode === "email" ? (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <input
+                type="email"
+                placeholder="advisor@insureace.com"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email address",
+                  },
+                })}
+                className="mt-1 block w-full rounded-md border px-3 py-2 text-gray-900 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message as string}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                placeholder="+91 9876543210"
+                {...register("phone", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^\+[1-9]\d{1,3}\s?\d{7,12}$/,
+                    message: "Phone must include country code (e.g., +91 9876543210)",
+                  },
+                })}
+                className="mt-1 block w-full rounded-md border px-3 py-2 text-gray-900 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message as string}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Password Input (added for both modes) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              {...register("password", {
+                required: "Password is required",
+              })}
+              className="mt-1 block w-full rounded-md border px-3 py-2 text-gray-900 focus:ring-emerald-500 focus:border-emerald-500"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message as string}
+              </p>
+            )}
+          </div>
+        
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-emerald-500 text-white font-semibold rounded-md hover:bg-emerald-600"
+          >
+            Sign In
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div className="text-center text-xs text-gray-500 mt-4">
+          Trusted by 1000+ Insurance Advisors <br />
+          🔒 Bank-Grade Security • ✅ IRDAI Compliant
+        </div>
+      </div>
     </div>
   );
 }

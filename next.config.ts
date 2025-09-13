@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next-i18next').UserConfig} */
+const config = {
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "hi", "mr"],
+  },
+  reloadOnPrerender: process.env.NODE_ENV === "development"
 };
 
-export default nextConfig;
+module.exports = config;
