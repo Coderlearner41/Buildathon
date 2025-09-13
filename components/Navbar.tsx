@@ -109,39 +109,53 @@ export default function Navbar() {
 
       {/* Right side */}
       <div className="flex items-center gap-4">
-        {/* Language Dropdown */}
-        <div className="relative group">
-          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18M3 12h18" />
-            </svg>
-          </button>
-          <div className="absolute right-0 top-full mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 invisible group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100">
-            {Object.keys(languageOptions).map((lang) => (
-              <button
-                key={lang}
-                onClick={() => handleLanguageChange(lang)}
-                className={`block w-full text-left px-4 py-2 text-sm ${
-                  activeLanguage === lang ? "text-emerald-600 font-semibold" : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {languageOptions[lang as keyof typeof languageOptions]}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Profile */}
+      <button
+        onClick={() => router.push("/profile")}
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+      </button>
 
-        {/* Sign Out */}
-        <button
-          onClick={handleSignOut}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H6" />
+      {/* Language Dropdown */}
+      <div className="relative group">
+        <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+          {/* Google Translate Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <path d="M20 5h-9.1l-.9-2H4c-1.1 0-2 .9-2 2v2h2V5h4.6l3.6 8H9.24L6 8l-1.8.9L7.48 15H11v2h2v-2h3.52L22 20l-2 2-4.48-4.48L12 10h8v2h2V7c0-1.1-.9-2-2-2z" />
           </svg>
         </button>
+        <div className="absolute right-0 top-full mt-2 w-32 bg-white rounded-md shadow-lg py-1 z-50 invisible group-hover:visible transition-all duration-300 transform scale-95 group-hover:scale-100">
+          {Object.keys(languageOptions).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => handleLanguageChange(lang)}
+              className={`block w-full text-left px-4 py-2 text-sm ${
+                activeLanguage === lang
+                  ? "text-emerald-600 font-semibold"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {languageOptions[lang as keyof typeof languageOptions]}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Sign Out */}
+      <button
+        onClick={handleSignOut}
+        className="flex items-center justify-center w-10 h-10 rounded-full transform scale-x-[-1] bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+          <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zm3-10H5c-1.1 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+        </svg>
+      </button>
+    </div>
+
+
     </nav>
   );
 }
