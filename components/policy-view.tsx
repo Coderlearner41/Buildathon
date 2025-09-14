@@ -1,118 +1,48 @@
-"use client"
+"use client";
 
 import React from "react";
-
-interface Policy {
-  id: string;
-  type: string;
-  insuranceCompany: string;
-  planName: string;
-  startDate: string;
-  endDate: string;
-  nomineeName: string;
-  nomineeRelation: string;
-  nomineeContact: string;
-}
+import { ApiPolicy } from "@/app/models/customer";
 
 interface PolicyDetailsFormProps {
-  policy: Policy;
+  policy: ApiPolicy;
 }
 
 const PolicyDetailsForm: React.FC<PolicyDetailsFormProps> = ({ policy }) => {
+  if (!policy) return null;
+
   return (
-    <div className="bg-white rounded-[30px] shadow p-6">
-      {/* Header */}
-      <div className="flex items-center space-x-3 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">{policy.id}</h2>
-        <span className="px-3 py-1 text-sm bg-gray-100 text-black rounded-full border">
-          {policy.type}
-        </span>
-      </div>
-
-      {/* Policy Information */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">
-        Policy Information
-      </h3>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        Policy Details
+      </h2>
+      <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
-            Insurance Company
-          </label>
-          <input
-            type="text"
-            value={policy.insuranceCompany}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
+          <p className="font-semibold text-black">Policy Name:</p>
+          <p className="text-black">{policy.policy_name || policy.policyName || "N/A"}</p>
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
-            Policy Plan / Product Name
-          </label>
-          <input
-            type="text"
-            value={policy.planName}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
+          <p className="font-semibold text-black">Join date:</p>
+          <p className="text-black">{policy.joinDate || "N/A"}</p>
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
-            Policy Start Date
-          </label>
-          <input
-            type="text"
-            value={policy.startDate}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
+          <p className="font-semibold text-black">Premium:</p>
+          <p className="text-black">{policy.premium || "-"}</p>
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
-            Policy End Date
-          </label>
-          <input
-            type="text"
-            value={policy.endDate}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
-        </div>
-      </div>
-
-      {/* Nominee Information */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-3">
-        Nominee Information
-      </h3>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-2">
-          <label className="block text-sm text-gray-600 mb-1">Nominee Name</label>
-          <input
-            type="text"
-            value={policy.nomineeName}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
+          <p className="font-semibold text-black">Renewal Date:</p>
+          <p className="text-black">{policy.renewalDate || "-"}</p>
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
-            Relationship to Policy Holder
-          </label>
-          <input
-            type="text"
-            value={policy.nomineeRelation}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-600 mb-1">Nominee Contact</label>
-          <input
-            type="text"
-            value={policy.nomineeContact}
-            readOnly
-            className="w-full px-3 py-2 border rounded-lg bg-gray-50"
-          />
+          <p className="font-semibold text-black">Status:</p>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              policy.status === "Pending"
+                ? "bg-yellow-400 text-black"
+                : "bg-green-600 text-white"
+            }`}
+          >
+            {policy.status || "unknown"}
+          </span>
         </div>
       </div>
     </div>

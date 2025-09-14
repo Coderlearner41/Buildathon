@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronRight, Filter, Plus, X, ArrowLeft } from "lucide-react";
+import { ChevronRight, Filter, ArrowLeft, Info } from "lucide-react";
 
 // Define a type for the policy data
 interface Policy {
@@ -437,15 +437,23 @@ const categories = [
 ];
 
 // Reusable component for a single policy card
-
-const PolicyCard: React.FC<{ policy: Policy; isListView?: boolean }> = ({ policy, isListView }) => (
+const PolicyCard: React.FC<{
+  policy: Policy;
+  onAdd?: (policy: Policy) => void;
+  onRemove?: (policyNumber: string) => void;
+  isShortlisted: boolean;
+  onSelectForCompare?: (policy: Policy) => void;
+  isSelected?: boolean;
+}> = ({ policy, onAdd, onRemove, isShortlisted, onSelectForCompare, isSelected }) => (
   <div
     className={`
-      relative flex-shrink-0 p-6 rounded-3xl border border-gray-100 
+      relative flex-shrink-0 p-6 rounded-3xl border border-gray-200 cursor-pointer
       bg-white font-inter transition-all duration-300 ease-out
       shadow-lg hover:shadow-2xl hover:-translate-y-2
-      ${isListView ? "w-full mb-4" : "w-[300px] h-[320px] mr-4"}
+      w-full sm:w-[300px] mb-4 sm:mr-4
+      ${isSelected ? 'border-4 border-teal-500' : ''}
     `}
+    onClick={() => onSelectForCompare && onSelectForCompare(policy)}
   >
     {/* Header */}
     <div className="flex items-center justify-between mb-6">
@@ -455,17 +463,18 @@ const PolicyCard: React.FC<{ policy: Policy; isListView?: boolean }> = ({ policy
           alt={`${policy.company} logo`}
           className="w-12 h-12 rounded-full border border-gray-200 shadow-sm"
         />
-        <span className="ml-3 font-semibold text-lg text-gray-900">
+        <span className="ml-3 font-semibold text-lg text-gray-900 flex items-center gap-2">
           {policy.company} – {policy.policyNumber}
+          <button
+            className="p-1 rounded-full hover:bg-gray-100 text-gray-500"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Info clicked for", policy.policyNumber);
+            }}
+          >
+            <Info size={18} />
+          </button>
         </span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition">
-          <Plus size={18} />
-        </button>
-        <button className="p-1.5 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-600 transition">
-          <X size={18} />
-        </button>
       </div>
     </div>
 
@@ -491,26 +500,143 @@ const PolicyCard: React.FC<{ policy: Policy; isListView?: boolean }> = ({ policy
 
     {/* Footer */}
     <div className="absolute bottom-6 left-6 right-6">
-      <button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-teal-600 hover:to-teal-700 transition-all">
-        View Policy Document
-      </button>
+      {isShortlisted ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove && onRemove(policy.policyNumber);
+          }}
+          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-red-600 hover:to-red-700 transition-all"
+        >
+          Remove from Shortlist
+        </button>
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAdd && onAdd(policy);
+          }}
+          className="w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white font-semibold py-2.5 rounded-xl shadow-md hover:shadow-lg hover:from-teal-600 hover:to-teal-700 transition-all"
+        >
+          Add to Shortlist
+        </button>
+      )}
     </div>
   </div>
 );
+
+const PolicyComparisonTable: React.FC<{ policies: Policy[]; onBack: () => void }> = ({ policies, onBack }) => {
+  const [policy1, policy2] = policies;
+  const properties = Object.keys(policiesData[0]).filter(key => key !== 'icon' && key !== 'category' && key !== 'company' && key !== 'policyNumber');
+
+  return (
+    <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-200">
+      <div className="flex items-center space-x-4 mb-6">
+        <button
+          onClick={onBack}
+          className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h2 className="text-2xl font-bold text-gray-800">Compare Policies</h2>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full text-left font-inter rounded-xl overflow-hidden">
+          <thead>
+            <tr className="bg-gray-100 text-gray-700">
+              <th className="py-4 px-6 font-medium text-sm rounded-tl-xl">Property</th>
+              <th className="py-4 px-6 font-semibold text-lg">{policy1.company}</th>
+              <th className="py-4 px-6 font-semibold text-lg rounded-tr-xl">{policy2.company}</th>
+            </tr>
+            <tr className="border-b border-gray-200 text-gray-600">
+              <td className="py-2 px-6 text-sm">Policy Number</td>
+              <td className="py-2 px-6">{policy1.policyNumber}</td>
+              <td className="py-2 px-6">{policy2.policyNumber}</td>
+            </tr>
+          </thead>
+          <tbody>
+            {properties.map((key) => (
+              <tr key={key} className="border-b border-gray-200 last:border-b-0">
+                <td className="py-3 px-6 font-medium text-gray-600 capitalize">
+                  {key.replace(/([A-Z])/g, ' $1')}
+                </td>
+                <td className="py-3 px-6 text-gray-900">{policy1[key as keyof Policy]}</td>
+                <td className="py-3 px-6 text-gray-900">{policy2[key as keyof Policy]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 
 const ComparePolicies = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [showListView, setShowListView] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [shortlistedPolicies, setShortlistedPolicies] = useState<Policy[]>([]);
+  const [policies, setPolicies] = useState<Policy[]>(policiesData);
+  const [selectedPoliciesToCompare, setSelectedPoliciesToCompare] = useState<Policy[]>([]);
+  const [showComparisonTable, setShowComparisonTable] = useState(false);
 
   const handleViewAllPolicies = (category: string) => {
     setSelectedCategory(category);
     setShowListView(true);
   };
 
-  const policiesForCategory = policiesData.filter(
+  const handleAddShortlist = (policy: Policy) => {
+    if (!shortlistedPolicies.find((p) => p.policyNumber === policy.policyNumber)) {
+      setShortlistedPolicies([...shortlistedPolicies, policy]);
+      setPolicies(policies.filter((p) => p.policyNumber !== policy.policyNumber));
+    }
+  };
+
+  const handleRemoveShortlist = (policyNumber: string) => {
+    const removedPolicy = shortlistedPolicies.find(
+      (p) => p.policyNumber === policyNumber
+    );
+    if (removedPolicy) {
+      setShortlistedPolicies(
+        shortlistedPolicies.filter((p) => p.policyNumber !== policyNumber)
+      );
+      setPolicies([...policies, removedPolicy].sort((a, b) => a.policyNumber.localeCompare(b.policyNumber)));
+    }
+  };
+
+  const handleSelectForCompare = (policy: Policy) => {
+    setSelectedPoliciesToCompare((prevSelected) => {
+      if (prevSelected.find((p) => p.policyNumber === policy.policyNumber)) {
+        return prevSelected.filter((p) => p.policyNumber !== policy.policyNumber);
+      } else if (prevSelected.length < 2) {
+        return [...prevSelected, policy];
+      }
+      return prevSelected;
+    });
+  };
+
+  const handleCompareClick = () => {
+    if (selectedPoliciesToCompare.length === 2) {
+      setShowComparisonTable(true);
+    }
+  };
+
+  const handleBackToShortlist = () => {
+    setShowComparisonTable(false);
+    setSelectedPoliciesToCompare([]);
+  };
+
+  const policiesForCategory = policies.filter(
     (policy) => policy.category === selectedCategory
   );
+  
+  const allShortlistedPolicyNumbers = new Set(shortlistedPolicies.map(p => p.policyNumber));
+
+  if (showComparisonTable) {
+    return <PolicyComparisonTable policies={selectedPoliciesToCompare} onBack={handleBackToShortlist} />;
+  }
 
   return (
     <div className="p-6 min-h-screen font-inter">
@@ -526,7 +652,10 @@ const ComparePolicies = () => {
               ? "bg-teal-500 text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
-          onClick={() => setActiveTab("all")}
+          onClick={() => {
+            setActiveTab("all");
+            setShowListView(false);
+          }}
         >
           All Policies
         </button>
@@ -536,28 +665,62 @@ const ComparePolicies = () => {
               ? "bg-teal-500 text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
-          onClick={() => setActiveTab("shortlisted")}
+          onClick={() => {
+            setActiveTab("shortlisted");
+            setShowListView(true);
+            setSelectedCategory("Shortlisted Policies");
+          }}
         >
-          Shortlisted Policies
+          Shortlisted Policies ({shortlistedPolicies.length})
         </button>
       </div>
 
       {showListView ? (
-        // List View
+        // List View for All Policies or Shortlisted Policies
         <div className="flex flex-col">
-          <div className="flex items-center mb-4 space-x-4">
-            <button
-              onClick={() => setShowListView(false)}
-              className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <h2 className="text-xl font-semibold text-gray-800">{selectedCategory}</h2>
+          <div className="flex items-center justify-between mb-4 space-x-4">
+            <div className="flex items-center space-x-4">
+              {selectedCategory !== "Shortlisted Policies" && (
+                <button
+                  onClick={() => setShowListView(false)}
+                  className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+              )}
+              <h2 className="text-xl font-semibold text-gray-800">{selectedCategory}</h2>
+            </div>
+            {activeTab === "shortlisted" && (
+              <button
+                onClick={handleCompareClick}
+                disabled={selectedPoliciesToCompare.length !== 2}
+                className={`py-2 px-6 rounded-full font-semibold transition-colors
+                  ${selectedPoliciesToCompare.length === 2 ? "bg-teal-500 text-white hover:bg-teal-600" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+              >
+                Compare Policies
+              </button>
+            )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[70vh]">
-            {policiesForCategory.map((policy: Policy, index: number) => (
-              <PolicyCard key={index} policy={policy} isListView={true} />
-            ))}
+            {selectedCategory === "Shortlisted Policies"
+              ? shortlistedPolicies.map((policy: Policy, index: number) => (
+                  <PolicyCard 
+                    key={index} 
+                    policy={policy} 
+                    onRemove={handleRemoveShortlist} 
+                    isShortlisted={true} 
+                    onSelectForCompare={handleSelectForCompare}
+                    isSelected={selectedPoliciesToCompare.some(p => p.policyNumber === policy.policyNumber)}
+                  />
+                ))
+              : policiesForCategory.map((policy: Policy, index: number) => (
+                  <PolicyCard
+                    key={index}
+                    policy={policy}
+                    onAdd={handleAddShortlist}
+                    isShortlisted={allShortlistedPolicyNumbers.has(policy.policyNumber)}
+                  />
+                ))}
           </div>
         </div>
       ) : (
@@ -582,11 +745,16 @@ const ComparePolicies = () => {
                 </div>
               </div>
               <div className="flex overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-teal-500 scrollbar-track-teal-200">
-                {policiesData
+                {policies
                   .filter((p) => p.category === category)
                   .slice(0, 10) // Display max 10 cards initially
                   .map((policy: Policy, index: number) => (
-                    <PolicyCard key={index} policy={policy} />
+                    <PolicyCard
+                      key={index}
+                      policy={policy}
+                      onAdd={handleAddShortlist}
+                      isShortlisted={allShortlistedPolicyNumbers.has(policy.policyNumber)}
+                    />
                   ))}
               </div>
             </div>

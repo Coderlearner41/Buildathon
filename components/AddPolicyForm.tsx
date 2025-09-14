@@ -16,7 +16,7 @@ interface ExtractedData {
   gender: string;
   address: string;
   contactNumbers: string;
-  emailId: string;
+  mailId: string;
   insuranceCompany: string;
   policyNumber: string;
   policyType: string;
@@ -119,7 +119,7 @@ const AddPolicyForm = () => {
     "gender": "",
     "contactNumbers": "",
     "alternateContact": "",
-    "emailId": "",
+    "mailId": "",
     "address": "",
     "insuranceCompany": "",
     "policyNumber": "",
@@ -170,10 +170,38 @@ const AddPolicyForm = () => {
 
   const handleAddPolicy = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+    console.log("Submitting form data:", formData);
     try {
-      console.log("Submitting form data:", formData);
-      const res = await axios.post(`${Backend_BASE_URL}/add-customer`, formData, {
+      // Map frontend data to backend schema
+      const payload = {
+        name: formData.fullName || "",
+        contact: formData.contactNumbers || "",
+        alternateContact: formData.alternateContact || "",
+        mailId: formData.mailId || "",
+        birthDate: formData.dateOfBirth || "",
+        gender: formData.gender || "",
+        address: formData.address,
+        policy: [
+          {
+            policyNumber: formData.policyNumber || "",
+            insuranceCompany: formData.insuranceCompany || "",
+            policyType: formData.policyType || "Term Life", // default if empty
+            premium: formData.premiumAmount ? Number(formData.premiumAmount) : 0,
+            policyName: formData.policyPlanProductName || "",
+            startDate: formData.policyStartDate || "",
+            renewalDate: formData.policyEndDate || "",
+            nomineeName: formData.nomineeName || "",
+            relation: formData.relationshipToPolicyholder || "",
+            nomineeContact: formData.nomineeContact || "",
+            claim: false,
+            status: "Submission",
+          }
+        ]
+      };
+  
+      console.log("Payload to send:", payload); // Check the payload in console
+  
+      const res = await axios.post(`${Backend_BASE_URL}/add-customer`, payload, {
         headers: { "Content-Type": "application/json" },
       });
   
@@ -181,10 +209,13 @@ const AddPolicyForm = () => {
       setFormData({} as ExtractedData);
       setUploadedFiles([]);
     } catch (err: any) {
-      console.error("❌ Error adding policy:", err);
+      console.error("❌ Error adding policy:", err.response?.data || err.message);
       alert("Failed to add policy");
     }
   };
+  
+  
+  
   return (
     <div className="flex flex-col lg:flex-row gap-6 bg-white rounded-3xl p-6 shadow-lg border border-gray-200">
       {/* Left: Upload + Autofill */}
@@ -324,7 +355,7 @@ const AddPolicyForm = () => {
                   type="date"
                   value={formData.dateOfBirth || ""}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, dob: e.target.value }))
+                    setFormData((prev) => ({ ...prev, dateOfBirth: e.target.value }))
                   }
                   className="border border-gray-300 text-black px-3 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
@@ -344,6 +375,11 @@ const AddPolicyForm = () => {
                 <input
                   type="text"
                   placeholder="Alternate Contact*"
+                  value={formData.alternateContact || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, alternateContact: e.target.value }))
+                  }
+
                   className="border text-black border-gray-300 px-3 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
@@ -368,17 +404,14 @@ const AddPolicyForm = () => {
               <input
                 type="text"
                 placeholder="Alternate Mobile Number"
-                value={formData.alternateContact || ""}
-                  onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, alternateContact: e.target.value }))
-                  }
+          
                 className="border text-black border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <input
               type="email"
               placeholder="E-mail Address"
-              value={formData.emailId || ""}
+              value={formData.mailId || ""}
                   onChange={(e) =>
                   setFormData((prev) => ({ ...prev, emailId: e.target.value }))
                   }

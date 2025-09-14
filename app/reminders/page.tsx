@@ -1,71 +1,115 @@
 "use client";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { ApiCustomer, ApiPolicy } from "../models/customer";
 
-// Example client data
-
-
-// const clients: Client[] = [
-//   { id: "1", name: "Rajesh Kumar", policy: "LIC-965656565", renewalDate: "3/09/2004" },
-//   { id: "2", name: "Anita Sharma", policy: "LIC-123456789", renewalDate: "10/09/2004" },
-//   { id: "3", name: "Vikram Singh", policy: "LIC-987654321", renewalDate: "15/09/2004" },
-// ];
-
-// Placeholder icons
+// ================= Placeholder Icons =================
 const UserIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9 9 0 1118.879 6.196 9 9 0 015.121 17.804z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a3 3 0 100-6 3 3 0 000 6z" />
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-6 h-6 text-white"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5.121 17.804A9 9 0 1118.879 6.196 9 9 0 015.121 17.804z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 12a3 3 0 100-6 3 3 0 000 6z"
+    />
   </svg>
 );
 
 const DocumentTextIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2-14H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z" />
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-6 h-6 text-white"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 12h6m-6 4h6m2-14H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"
+    />
   </svg>
 );
 
 const CalendarIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-6 h-6 text-white"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"
+    />
   </svg>
 );
 
-interface ApiCustomer {
-    name: string;
-    contact: string;
-    mailId: string;
-    PolicyNumber: string,
-    nextRenewalIn: number;
-    policies: number;
-  }
-
-
-export default function App() {
-    const [clients, setClients] = useState<ApiCustomer[]>([]);
-    useEffect(() => {
-        const fetchCustomers = async () => {
-          try {
-            const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://buildathon-5n46.vercel.app';
-            const res = await axios.get(`${API_BASE_URL}/dashboard-customer`);
-            const data = res.data.map((c: ApiCustomer, idx: number) => ({ ...c, id: String(idx + 1) }));
-            console.log(data);
-            setClients(data);
-          } catch (err) {
-            console.error("Error fetching customers:", err);
-          }
-        };
-        fetchCustomers();
-      }, []);
-
-  // State to track toggles per client
+// ================= Main Component =================
+export default function ReminderPage() {
+  const [clients, setClients] = useState<ApiCustomer[]>([]);
   const [toggles, setToggles] = useState<
     Record<string, { sms: boolean; whatsapp: boolean; mail: boolean }>
   >({});
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const API_BASE_URL =
+          process.env.NEXT_PUBLIC_BACKEND_URL ||
+          "https://buildathon-5n46.vercel.app";
+
+        const res = await axios.get(`${API_BASE_URL}/customer-details`);
+        console.log("Raw API response:", res.data);
+
+        let customers: ApiCustomer[] = [];
+
+        if (Array.isArray(res.data)) {
+          customers = res.data;
+        } else if (res.data && Array.isArray(res.data.customers)) {
+          customers = res.data.customers;
+        } else {
+          console.error("Unexpected response format:", res.data);
+          return;
+        }
+
+        const data = customers.map((c: any, idx: number) => ({
+          ...c,
+          id: String(c._id || idx + 1),
+          policy: c.policy || [],
+        }));
+
+        setClients(data);
+      } catch (err) {
+        console.error("Error fetching customers:", err);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
   const handleToggle = (clientId: string, type: "sms" | "whatsapp" | "mail") => {
     setToggles((prev) => {
-      const current = prev[clientId] || { sms: false, whatsapp: false, mail: false };
+      const current =
+        prev[clientId] || { sms: false, whatsapp: false, mail: false };
       return {
         ...prev,
         [clientId]: {
@@ -74,6 +118,68 @@ export default function App() {
         },
       };
     });
+  };
+
+  // ================= Helper: Find nearest renewal date =================
+  const getNearestRenewal = (policies: ApiPolicy[]): string => {
+    console.log("something:" ,policies);
+    // if (!policies || policies.length === 0) return "N/A";
+    const validDates = policies.map((p) => p.renewalDate);
+
+    if (validDates.length === 0) return "N/A";
+
+    const minDate = new Date(
+      Math.min(...validDates.map((d) => new Date(d).getTime()))
+    );
+
+    return minDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const sendWhatsAppReminder = async (client: ApiCustomer) => {
+    
+
+    // pick nearest policy
+    const nearestPolicy = client.policy.reduce((earliest, current) => {
+      if (!earliest.renewalDate) return current;
+      if (!current.renewalDate) return earliest;
+
+      return new Date(current.renewalDate) <
+        new Date(earliest.renewalDate)
+        ? current
+        : earliest;
+    });
+
+    const renewalDate = nearestPolicy?.renewalDate
+      ? null :  "N/A";
+
+    const body = {
+      customerName: client.name,
+      policy: {
+        policyName: nearestPolicy.policyName,
+        policyNumber: nearestPolicy.policyNumber,
+        insuranceCompany: nearestPolicy.insuranceCompany,
+      },
+      renewalDate,
+      contact: client.contact, // 👈 Make sure contact is in +91... format
+    };
+
+    try {
+      const res = await axios.post(
+        "https://buildathon-team-5.vercel.app/send-renewal-reminder",
+        body
+      );
+
+      if (res.status === 200) {
+        alert(`WhatsApp reminder sent to ${client.name}`);
+      }
+    } catch (err: any) {
+      console.error("Reminder API error:", err.response || err);
+      alert("Failed to send reminder (422 or error)");
+    }
   };
 
   return (
@@ -101,7 +207,7 @@ export default function App() {
               <h2 className="text-[24px] font-inter">Renewals this week</h2>
               <UserIcon />
             </div>
-            <p className="text-[44px] text- fontwhite-bold">2</p>
+            <p className="text-[44px] font-bold">2</p>
             <span className="text-[14px] text-white/80">Requires Attention</span>
           </div>
 
@@ -113,8 +219,10 @@ export default function App() {
               <h2 className="text-[24px] font-inter">Overdue Renewals</h2>
               <DocumentTextIcon />
             </div>
-            <p className="text-[44px] text-white font-bold">1</p>
-            <span className="text-[14px] text-white/80">Immediate Action NEeded</span>
+            <p className="text-[44px] font-bold">1</p>
+            <span className="text-[14px] text-white/80">
+              Immediate Action Needed
+            </span>
           </div>
 
           <div
@@ -122,11 +230,13 @@ export default function App() {
             style={{ backgroundColor: "#00BDAA" }}
           >
             <div className="flex items-center justify-between mb-1 min-w-[280px]">
-              <h2 className="text-[24px] font-inter">Active Notification</h2>
+              <h2 className="text-[24px] font-inter">Active Notifications</h2>
               <CalendarIcon />
             </div>
-            <p className="text-[44px] text-white font-bold">6</p>
-            <span className="text-[14px] text-white/80">Automated Remainders</span>
+            <p className="text-[44px] font-bold">6</p>
+            <span className="text-[14px] text-white/80">
+              Automated Reminders
+            </span>
           </div>
         </div>
 
@@ -136,10 +246,10 @@ export default function App() {
             <thead>
               <tr className="bg-[#D9D9D9] text-black">
                 <th className="py-3 px-4">Client</th>
-                <th className="py-3 px-4">Policy Number</th>
-                <th className="py-3 px-4">Renewal Date</th>
+                <th className="py-3 px-4">Contact</th>
+                <th className="py-3 px-4">Nearest Renewal Date</th>
                 <th className="py-3 px-4">SMS</th>
-                <th className="py-3 px-4">Whatsapp</th>
+                <th className="py-3 px-4">WhatsApp</th>
                 <th className="py-3 px-4">Mail</th>
                 <th className="py-3 px-4">Action</th>
               </tr>
@@ -147,15 +257,22 @@ export default function App() {
             <tbody>
               {clients.map((client) => {
                 const clientToggle =
-                  toggles[client.mailId] || { sms: false, whatsapp: false, mail: false };
+                  toggles[client.id] || {
+                    sms: false,
+                    whatsapp: false,
+                    mail: false,
+                  };
+
                 return (
                   <tr
-                    key={client.mailId}
+                    key={client.id}
                     className="hover:bg-gray-200 text-black transition-colors duration-200"
                   >
                     <td className="py-3 px-4">{client.name}</td>
-                    <td className="py-3 px-4">{client.PolicyNumber}</td>
-                    <td className="py-3 px-4">{client.nextRenewalIn}</td>
+                    <td className="py-3 px-4">{client.contact}</td>
+                    <td className="py-3 px-4">
+                      {getNearestRenewal(client.policy || [])}
+                    </td>
 
                     {/* SMS Toggle */}
                     <td className="py-3 px-4">
@@ -164,40 +281,44 @@ export default function App() {
                           type="checkbox"
                           className="sr-only"
                           checked={clientToggle.sms}
-                          onChange={() => handleToggle(client.mailId, "sms")}
+                          onChange={() =>
+                            handleToggle(client.mailId ?? client.id, "sms")
+                          }
                         />
                         <div
                           className={`w-11 h-6 bg-gray-300 rounded-full transition ${
                             clientToggle.sms ? "bg-green-500" : ""
                           }`}
-                        ></div>
+                        />
                         <div
                           className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${
                             clientToggle.sms ? "translate-x-5" : ""
                           }`}
-                        ></div>
+                        />
                       </label>
                     </td>
 
-                    {/* Whatsapp Toggle */}
+                    {/* WhatsApp Toggle */}
                     <td className="py-3 px-4">
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
                           className="sr-only"
                           checked={clientToggle.whatsapp}
-                          onChange={() => handleToggle(client.mailId, "whatsapp")}
+                          onChange={() =>
+                            handleToggle(client.mailId ?? client.id, "whatsapp")
+                          }
                         />
                         <div
                           className={`w-11 h-6 bg-gray-300 rounded-full transition ${
                             clientToggle.whatsapp ? "bg-green-500" : ""
                           }`}
-                        ></div>
+                        />
                         <div
                           className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${
                             clientToggle.whatsapp ? "translate-x-5" : ""
                           }`}
-                        ></div>
+                        />
                       </label>
                     </td>
 
@@ -208,18 +329,20 @@ export default function App() {
                           type="checkbox"
                           className="sr-only"
                           checked={clientToggle.mail}
-                          onChange={() => handleToggle(client.mailId, "mail")}
+                          onChange={() =>
+                            handleToggle(client.mailId ?? client.id, "mail")
+                          }
                         />
                         <div
                           className={`w-11 h-6 bg-gray-300 rounded-full transition ${
                             clientToggle.mail ? "bg-green-500" : ""
                           }`}
-                        ></div>
+                        />
                         <div
                           className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${
                             clientToggle.mail ? "translate-x-5" : ""
                           }`}
-                        ></div>
+                        />
                       </label>
                     </td>
 
@@ -230,6 +353,7 @@ export default function App() {
                           xmlns="http://www.w3.org/2000/svg"
                           className="w-5 h-5"
                           fill="none"
+                          onClick={() => sendWhatsAppReminder(client)}
                           viewBox="0 0 24 24"
                           stroke="currentColor"
                           strokeWidth={2}

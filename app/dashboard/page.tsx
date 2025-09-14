@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ICustomer, RenewalResult } from "../models/customer";
+import type { Customer, RenewalResult } from "../models/customer";
 import { Phone, Mail } from "lucide-react";
 import axios from "axios";
 
 export default function DashboardPage() {
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [upcomingRenewals, setUpcomingRenewals] = useState<RenewalResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [stats, setStats] = useState({
@@ -142,15 +142,15 @@ export default function DashboardPage() {
             </thead>
             <tbody>
               {customers.map((customer, idx) => {
-                const policiesCount = customer.policy?.length || 0;
+                // const policiesCount = customer.policy?.length || 0;
                 const statusColor = customer.nextRenewalIn && customer.nextRenewalIn <= 7 ? "bg-red-300 text-white" : "bg-yellow-200 text-black";
 
                 return (
                   <tr key={idx} className="mb-2 text-black hover:bg-gray-200 transition-colors duration-200">
                     <td className="py-3 px-4">{customer.name}</td>
                     <td className="py-3 px-4">{customer.policyNumber}</td>{/* Policy number not in customer data */}
-                    <td className="py-3 px-4">{customer.policies}</td>
-                    <td className="py-3 px-4">{customer.premium}</td>{/* Premium not in customer data */}
+                    <td className="py-3 px-4">{customer.policyNumber}</td>
+                    <td className="py-3 px-4">{customer.premium}</td>
                     <td className="py-3 px-4">
                       {customer.nextRenewalIn !== undefined && (
                         <span className={`${statusColor} px-3 py-1 rounded-full`}>
