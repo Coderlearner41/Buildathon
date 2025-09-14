@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
 
 // ✅ Updated SVGs
 const navItems = [
@@ -161,20 +162,18 @@ export default function Navbar() {
       {/* Logo */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex items-center justify-center bg-emerald-500 rounded-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-white"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 17.65L5 15.68V8.32L12 4.35l7 3.97v7.36l-7 3.97z" />
-              <path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            </svg>
-          </div>
-          <span className="font-bold text-gray-900 text-lg text-[35px]">
-            PoliSync
-          </span>
+    <div className="w-8 h-8 flex items-center justify-center rounded-lg overflow-hidden">
+      <Image
+        src="/assets/vector.png" // path inside public/
+        alt="PoliSync Logo"
+        width={32}
+        height={32}
+        className="object-contain"
+      />
+    </div>
+    <span className="font-bold text-gray-900 text-lg text-[35px]">
+      PoliSync
+    </span>
         </div>
       </div>
 

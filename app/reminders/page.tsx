@@ -178,7 +178,7 @@ export default function ReminderPage() {
       }
     } catch (err: any) {
       console.error("Reminder API error:", err.response || err);
-      alert("Failed to send reminder (422 or error)");
+    //   alert("Failed to send reminder (422 or error)");
     }
   };
 
@@ -188,15 +188,12 @@ export default function ReminderPage() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-10 text-center">
-          <h1
-            className="text-4xl font-extrabold text-gray-900 md:text-5xl lg:text-6xl"
-            style={{ fontSize: "26px" }}
-          >
+        <header className="mb-10">
+        <p className="text-gray-600 font-inter text-[18px] sm:text-[20px]">
             Manage your customer relationships and policies
-          </h1>
+          </p>
         </header>
-
+        {/* Manage your customer relationships and policies */}
         {/* Dashboard Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div

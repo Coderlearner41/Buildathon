@@ -640,7 +640,7 @@ const ComparePolicies = () => {
 
   return (
     <div className="p-6 min-h-screen font-inter">
-      <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-gray-900">
+      <h1 className="text-[30px] mb-4 text-gray-700">
         Compare policies offered by different companies across different policy types
       </h1>
       

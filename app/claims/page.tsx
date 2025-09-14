@@ -430,7 +430,7 @@ const App = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Initiate new claims and track existing ones</h1>
+          <h1 className="text-xl  text-black">Initiate new claims and track existing ones</h1>
         </div>
 
         {/* Tabs */}
